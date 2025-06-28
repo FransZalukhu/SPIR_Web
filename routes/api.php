@@ -23,12 +23,22 @@ Route::post('/login', [UserController::class, 'login']);;
 
 Route::post('/admin/login', [AdminLoginApiController::class, 'login']);
 
+Route::put('/users/{id}', [UserController::class, 'update']);
+
+Route::middleware('auth:sanctum')->group(function () {
+    Route::patch('/users/{id}', [UserController::class, 'update']);
+});
+
 Route::get('/reports', [ReportController::class, 'index']);
 
 Route::get('/reports/{id}', [ReportController::class, 'show']);
 
 Route::middleware('auth:sanctum')->group(function () {
     Route::post('/reports', [ReportController::class, 'store']); // buat report
+});
+
+Route::middleware(['auth:sanctum'])->group(function () {
+    Route::patch('/admin/reports/{id}/status', [ReportAdminController::class, 'updateStatus']);
 });
 
 Route::middleware('auth:api')->group(function () {

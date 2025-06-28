@@ -129,6 +129,65 @@ class UserController extends Controller
         }
     }
 
+    public function update(Request $request, $id)
+    {
+        try {
+            $user = User::find($id);
+
+            if (!$user) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'User not found',
+                ], 404);
+            }
+
+            $validator = Validator::make($request->all(), [
+                'name' => 'sometimes|required|string|max:100',
+                'phone_number' => 'sometimes|required|string|max:20|unique:users,phone_number,' . $id,
+                'password' => 'nullable|string|min:6',
+                'role' => 'sometimes|in:user,admin',
+            ]);
+
+            if ($validator->fails()) {
+                return response()->json([
+                    'success' => false,
+                    'errors' => $validator->errors(),
+                ], 422);
+            }
+
+            // Update data jika ada
+            if ($request->has('name')) {
+                $user->name = $request->name;
+            }
+
+            if ($request->has('phone_number')) {
+                $user->phone_number = $request->phone_number;
+            }
+
+            if ($request->filled('password')) {
+                $user->password = Hash::make($request->password);
+            }
+
+            if ($request->has('role')) {
+                $user->role = $request->role;
+            }
+
+            $user->save();
+
+            return response()->json([
+                'success' => true,
+                'message' => 'User updated successfully',
+                'data' => $user,
+            ], 200);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Failed to update user',
+                'error' => $e->getMessage(),
+            ], 500);
+        }
+    }
+
     public function index()
     {
         try {
