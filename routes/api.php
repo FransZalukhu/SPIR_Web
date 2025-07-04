@@ -6,6 +6,7 @@ use App\Http\Controllers\Api\UserController;
 use App\Http\Controllers\Api\ReportController;
 use App\Http\Controllers\Admin\ReportAdminController;
 use App\Http\Controllers\Api\AdminLoginApiController;
+use App\Http\Controllers\Api\CategoryController;
 
 /*
 |--------------------------------------------------------------------------
@@ -24,10 +25,8 @@ Route::middleware('auth:sanctum')->post('/logout', [UserController::class, 'logo
 
 Route::post('/admin/login', [AdminLoginApiController::class, 'login']);
 
-Route::put('/users/{id}', [UserController::class, 'update']);
-
 Route::middleware('auth:sanctum')->group(function () {
-    Route::patch('/users/{id}', [UserController::class, 'update']);
+    Route::patch('/user', [UserController::class, 'update']);
 });
 
 Route::get('/reports', [ReportController::class, 'index']);
@@ -35,7 +34,7 @@ Route::get('/reports', [ReportController::class, 'index']);
 Route::get('/reports/{id}', [ReportController::class, 'show']);
 
 Route::middleware('auth:sanctum')->group(function () {
-    Route::post('/reports', [ReportController::class, 'store']); // buat report
+    Route::post('/reports', [ReportController::class, 'store']);
 });
 
 Route::middleware('auth:sanctum')->group(function () {
@@ -53,6 +52,8 @@ Route::middleware('auth:api')->group(function () {
 Route::middleware('auth:api')->group(function () {
     Route::get('/admin/users', [UserController::class, 'getUsers']);
 });
+
+Route::get('/categories', [CategoryController::class, 'index']);
 
 Route::middleware('auth:sanctum')->get('/user', [UserController::class, 'me']);
 
