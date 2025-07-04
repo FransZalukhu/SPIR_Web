@@ -20,6 +20,7 @@ use App\Http\Controllers\Api\AdminLoginApiController;
 
 Route::post('/register', [UserController::class, 'register']);
 Route::post('/login', [UserController::class, 'login']);;
+Route::middleware('auth:sanctum')->post('/logout', [UserController::class, 'logout']);
 
 Route::post('/admin/login', [AdminLoginApiController::class, 'login']);
 
@@ -37,6 +38,10 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('/reports', [ReportController::class, 'store']); // buat report
 });
 
+Route::middleware('auth:sanctum')->group(function () {
+    Route::get('/my-reports', [ReportController::class, 'myReports']);
+});
+
 Route::middleware(['auth:sanctum'])->group(function () {
     Route::patch('/admin/reports/{id}/status', [ReportAdminController::class, 'updateStatus']);
 });
@@ -49,7 +54,8 @@ Route::middleware('auth:api')->group(function () {
     Route::get('/admin/users', [UserController::class, 'getUsers']);
 });
 
-// Untuk API routes
+Route::middleware('auth:sanctum')->get('/user', [UserController::class, 'me']);
+
 Route::get('/users', [UserController::class, 'index']);
 Route::get('/users/paginated', [UserController::class, 'indexPaginated']);
 Route::get('/users/secure', [UserController::class, 'indexSecure']);

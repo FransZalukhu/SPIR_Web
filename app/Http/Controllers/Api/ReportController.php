@@ -53,6 +53,27 @@ class ReportController extends Controller
         ]);
     }
 
+    public function myReports(Request $request)
+    {
+        $user = $request->user();
+
+        $reports = Report::with(['category'])
+            ->where('user_id', $user->id)
+            ->orderBy('created_at', 'desc')
+            ->get()
+            ->map(function ($report) {
+                return $report->makeHidden(['photo_path'])->toArray() + [
+                    'photo_url' => $report->photo_url,
+                    'category' => $report->category?->name,
+                ];
+            });
+
+        return response()->json([
+            'status' => true,
+            'data' => $reports,
+        ]);
+    }
+
     public function index()
     {
         $reports = Report::with(['user', 'category'])

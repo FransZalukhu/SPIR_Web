@@ -35,7 +35,7 @@ class UserController extends Controller
 
         return response()->json([
             'status' => true,
-            'message' => 'User registered successfully',
+            'message' => 'Berhasil Mendaftar',
             'data' => $user,
         ], 201);
     }
@@ -59,7 +59,7 @@ class UserController extends Controller
         if (!$user || !Hash::check($request->password, $user->password)) {
             return response()->json([
                 'status' => false,
-                'message' => 'Invalid phone number or password',
+                'message' => 'Username atau Password Salah',
             ], 401);
         }
 
@@ -74,6 +74,25 @@ class UserController extends Controller
         ], 200);
     }
 
+    public function logout(Request $request)
+    {
+        try {
+            // Menghapus token saat ini
+            $request->user()->currentAccessToken()->delete();
+
+            return response()->json([
+                'status' => true,
+                'message' => 'Logout berhasil',
+            ], 200);
+        } catch (\Exception $e) {
+            return response()->json([
+                'status' => false,
+                'message' => 'Gagal logout',
+                'error' => $e->getMessage()
+            ], 500);
+        }
+    }
+
     // GET /api/users/{id}
     public function show($id)
     {
@@ -83,7 +102,7 @@ class UserController extends Controller
             if (!$user) {
                 return response()->json([
                     'success' => false,
-                    'message' => 'User not found',
+                    'message' => 'User Tidak Ditemukan',
                 ], 404);
             }
 
@@ -96,6 +115,25 @@ class UserController extends Controller
             return response()->json([
                 'success' => false,
                 'message' => 'Failed to retrieve user',
+                'error' => $e->getMessage()
+            ], 500);
+        }
+    }
+
+    public function me(Request $request)
+    {
+        try {
+            $user = $request->user();
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Data user berhasil diambil',
+                'data' => $user
+            ], 200);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Gagal mengambil data user',
                 'error' => $e->getMessage()
             ], 500);
         }
