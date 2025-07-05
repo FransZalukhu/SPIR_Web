@@ -14,6 +14,7 @@ class Report extends Model
         'category_id',
         'title',
         'description',
+        'location',
         'latitude',
         'longitude',
         'photo_path',

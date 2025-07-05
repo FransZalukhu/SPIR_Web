@@ -4,6 +4,7 @@ use App\Http\Controllers\ProfileController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Admin\ReportAdminController;
 use App\Http\Controllers\Admin\LoginController;
+use App\Http\Controllers\Api\DashboardController;
 use Illuminate\Support\Facades\Auth;
 
 /*
@@ -31,6 +32,10 @@ Route::get('/dashboard', function () {
     }
     return view('dashboard');
 })->name('dashboard')->middleware('auth');
+
+Route::prefix('admin')->middleware(['auth'])->group(function () {
+    Route::get('/dashboard/data', [DashboardController::class, 'getData'])->name('admin.dashboard.data');
+});
 
 Route::get('/reports', [ReportAdminController::class, 'showReportPage'])->name('admin.reports')->middleware('auth');
 

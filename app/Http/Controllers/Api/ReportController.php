@@ -15,6 +15,7 @@ class ReportController extends Controller
         $validator = Validator::make($request->all(), [
             'title' => 'required|string|max:255',
             'description' => 'required|string',
+            'location' => 'required|string',
             'latitude' => 'required|numeric',
             'longitude' => 'required|numeric',
             'photo' => 'required|image|mimes:jpeg,png,jpg|max:2048',
@@ -38,6 +39,7 @@ class ReportController extends Controller
             'category_id' => $request->category_id,
             'title' => $request->title,
             'description' => $request->description,
+            'location' => $request->location,
             'latitude' => $request->latitude,
             'longitude' => $request->longitude,
             'photo_path' => $photoPath,

@@ -22,88 +22,66 @@
 </div>
 
 <div class="mt-10 grid grid-cols-1 md:grid-cols-2 gap-6">
-    <!-- Bar Chart -->
+    <!-- Bar Chart: Jumlah User -->
     <div class="bg-white p-6 rounded shadow chart-container">
-        <h2 class="text-lg font-semibold mb-2">Laporan per Status</h2>
-        <canvas id="statusChart" class="max-h-80 h-80 w-full"></canvas>
+        <h2 class="text-lg font-semibold mb-2">Jumlah User per Bulan</h2>
+        <canvas id="userChart" class="max-h-80 h-80 w-full"></canvas>
     </div>
 
-    <!-- Donut Chart -->
+    <!-- Donut Chart: Status Laporan -->
     <div class="bg-white p-6 rounded shadow chart-container">
         <h2 class="text-lg font-semibold mb-2">Distribusi Laporan</h2>
         <canvas id="donutChart" class="max-h-80 h-80 w-full"></canvas>
     </div>
 </div>
 
-@php
-$statusCounts = [
-\App\Models\Report::where('status', 'pending')->count(),
-\App\Models\Report::where('status', 'diverifikasi')->count(),
-\App\Models\Report::where('status', 'diproses')->count(),
-\App\Models\Report::where('status', 'selesai')->count(),
-];
-
-$statusCountsJson = json_encode($statusCounts);
-@endphp
-
 <script>
-document.addEventListener('DOMContentLoaded', function() {
-    const statusCountsRaw = '@json($statusCounts)';
-    const statusCounts = JSON.parse(statusCountsRaw);
+    document.addEventListener('DOMContentLoaded', async function() {
+        const response = await fetch("{{ route('admin.dashboard.data') }}");
+        const data = await response.json();
 
-    // Bar Chart
-    const ctxBar = document.getElementById('statusChart').getContext('2d');
-    new Chart(ctxBar, {
-        type: 'bar',
-        data: {
-            labels: ['Pending', 'Diverifikasi', 'Diproses', 'Selesai'],
-            datasets: [{
-                label: 'Jumlah Laporan',
-                data: statusCounts,
-                backgroundColor: ['#facc15', '#3b82f6', '#6366f1', '#22c55e'],
-            }]
-        },
-        options: {
-            responsive: true,
-            scales: {
-                y: {
-                    beginAtZero: true,
-                    ticks: {
-                        callback: function(value, index, values) {
-                            return value.toFixed(0); // Konversi ke bilangan bulat
-                        }
+        const months = data.months;
+        const userCounts = data.userCounts;
+        const statusCounts = Object.values(data.statusCounts);
+
+        // Chart: User per bulan
+        const ctxBar = document.getElementById('userChart').getContext('2d');
+        new Chart(ctxBar, {
+            type: 'bar',
+            data: {
+                labels: months,
+                datasets: [{
+                    label: 'Jumlah User Terdaftar',
+                    data: userCounts,
+                    backgroundColor: '#3b82f6'
+                }]
+            },
+            options: {
+                responsive: true,
+                scales: {
+                    y: {
+                        beginAtZero: true
                     }
                 }
             }
-        }
-    });
+        });
 
-    // Donut Chart
-    const ctxDonut = document.getElementById('donutChart').getContext('2d');
-    new Chart(ctxDonut, {
-        type: 'doughnut',
-        data: {
-            labels: ['Pending', 'Diverifikasi', 'Diproses', 'Selesai'],
-            datasets: [{
-                label: 'Distribusi',
-                data: statusCounts,
-                backgroundColor: ['#facc15', '#3b82f6', '#6366f1', '#22c55e'],
-                borderWidth: 1
-            }]
-        },
-        options: {
-            responsive: true,
-            plugins: {
-                tooltip: {
-                    callbacks: {
-                        label: function(context) {
-                            return context.label + ': ' + context.formattedValue;
-                        }
-                    }
-                }
+        // Donut: Status laporan
+        const ctxDonut = document.getElementById('donutChart').getContext('2d');
+        new Chart(ctxDonut, {
+            type: 'doughnut',
+            data: {
+                labels: ['Pending', 'Diverifikasi', 'Diproses', 'Selesai'],
+                datasets: [{
+                    data: statusCounts,
+                    backgroundColor: ['#facc15', '#3b82f6', '#6366f1', '#22c55e'],
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                responsive: true
             }
-        }
+        });
     });
-});
 </script>
 @endsection
