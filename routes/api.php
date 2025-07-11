@@ -7,6 +7,7 @@ use App\Http\Controllers\Api\ReportController;
 use App\Http\Controllers\Admin\ReportAdminController;
 use App\Http\Controllers\Api\AdminLoginApiController;
 use App\Http\Controllers\Api\CategoryController;
+use App\Http\Controllers\Api\CommentController;
 
 /*
 |--------------------------------------------------------------------------
@@ -38,6 +39,10 @@ Route::middleware('auth:sanctum')->group(function () {
 });
 
 Route::middleware('auth:sanctum')->group(function () {
+    Route::delete('/my-reports/{id}', [ReportController::class, 'destroyOwnReport']);
+});
+
+Route::middleware('auth:sanctum')->group(function () {
     Route::get('/my-reports', [ReportController::class, 'myReports']);
 });
 
@@ -63,3 +68,12 @@ Route::get('/users/secure', [UserController::class, 'indexSecure']);
 Route::get('/users/by-role', [UserController::class, 'indexByRole']);
 Route::get('/users/{id}', [UserController::class, 'show']);
 Route::delete('/users/{id}', [UserController::class, 'destroy']);
+
+// Komentar
+Route::get('/reports/{report}/comments', [CommentController::class, 'index']);
+
+Route::middleware('auth:sanctum')->group(function () {
+    Route::post('/reports/{report}/comments', [CommentController::class, 'store']);
+    Route::put('/comments/{comment}', [CommentController::class, 'update']);
+    Route::delete('/comments/{comment}', [CommentController::class, 'destroy']);
+});

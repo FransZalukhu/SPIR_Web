@@ -7,6 +7,7 @@ use App\Models\Report;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Storage;
 
 class ReportController extends Controller
 {
@@ -55,6 +56,33 @@ class ReportController extends Controller
         ]);
     }
 
+    public function destroyOwnReport($id, Request $request)
+    {
+        $user = $request->user();
+
+        $report = Report::where('id', $id)
+            ->where('user_id', $user->id)
+            ->first();
+
+        if (!$report) {
+            return response()->json([
+                'status' => false,
+                'message' => 'Laporan tidak ditemukan atau Anda tidak memiliki akses.',
+            ], 404);
+        }
+
+        if ($report->photo_path && Storage::disk('public')->exists($report->photo_path)) {
+            Storage::disk('public')->delete($report->photo_path);
+        }
+
+        $report->delete();
+
+        return response()->json([
+            'status' => true,
+            'message' => 'Laporan berhasil dihapus.',
+        ]);
+    }
+
     public function myReports(Request $request)
     {
         $user = $request->user();
@@ -78,7 +106,7 @@ class ReportController extends Controller
 
     public function index()
     {
-        $reports = Report::with(['user', 'category'])
+        $reports = Report::with(['user', 'category', 'comments.user'])
             ->orderBy('created_at', 'desc')
             ->get()
             ->map(function ($report) {
