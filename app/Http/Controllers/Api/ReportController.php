@@ -19,7 +19,7 @@ class ReportController extends Controller
             'location' => 'required|string',
             'latitude' => 'required|numeric',
             'longitude' => 'required|numeric',
-            'photo' => 'required|image|mimes:jpeg,png,jpg|max:2048',
+            'photo' => 'required|image|mimes:jpeg,png,jpg|max:5012',
             'category_id' => 'required|exists:categories,id',
         ]);
 
